@@ -15,6 +15,12 @@ import { Route as JustificativasRouteImport } from './routes/justificativas'
 import { Route as ExtratoRouteImport } from './routes/extrato'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminUsuariosRouteImport } from './routes/admin/usuarios'
+import { Route as AdminTagsRouteImport } from './routes/admin/tags'
+import { Route as AdminSalasRouteImport } from './routes/admin/salas'
+import { Route as AdminInventarioRouteImport } from './routes/admin/inventario'
+import { Route as AdminEventosRouteImport } from './routes/admin/eventos'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -46,6 +52,36 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
+  id: '/admin/usuarios',
+  path: '/admin/usuarios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminTagsRoute = AdminTagsRouteImport.update({
+  id: '/admin/tags',
+  path: '/admin/tags',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSalasRoute = AdminSalasRouteImport.update({
+  id: '/admin/salas',
+  path: '/admin/salas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminInventarioRoute = AdminInventarioRouteImport.update({
+  id: '/admin/inventario',
+  path: '/admin/inventario',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminEventosRoute = AdminEventosRouteImport.update({
+  id: '/admin/eventos',
+  path: '/admin/eventos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +90,12 @@ export interface FileRoutesByFullPath {
   '/justificativas': typeof JustificativasRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/admin/eventos': typeof AdminEventosRoute
+  '/admin/inventario': typeof AdminInventarioRoute
+  '/admin/salas': typeof AdminSalasRoute
+  '/admin/tags': typeof AdminTagsRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +104,12 @@ export interface FileRoutesByTo {
   '/justificativas': typeof JustificativasRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/admin/eventos': typeof AdminEventosRoute
+  '/admin/inventario': typeof AdminInventarioRoute
+  '/admin/salas': typeof AdminSalasRoute
+  '/admin/tags': typeof AdminTagsRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +119,12 @@ export interface FileRoutesById {
   '/justificativas': typeof JustificativasRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/admin/eventos': typeof AdminEventosRoute
+  '/admin/inventario': typeof AdminInventarioRoute
+  '/admin/salas': typeof AdminSalasRoute
+  '/admin/tags': typeof AdminTagsRoute
+  '/admin/usuarios': typeof AdminUsuariosRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,8 +135,26 @@ export interface FileRouteTypes {
     | '/justificativas'
     | '/login'
     | '/signup'
+    | '/admin/eventos'
+    | '/admin/inventario'
+    | '/admin/salas'
+    | '/admin/tags'
+    | '/admin/usuarios'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/extrato' | '/justificativas' | '/login' | '/signup'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/extrato'
+    | '/justificativas'
+    | '/login'
+    | '/signup'
+    | '/admin/eventos'
+    | '/admin/inventario'
+    | '/admin/salas'
+    | '/admin/tags'
+    | '/admin/usuarios'
+    | '/admin'
   id:
     | '__root__'
     | '/'
@@ -91,6 +163,12 @@ export interface FileRouteTypes {
     | '/justificativas'
     | '/login'
     | '/signup'
+    | '/admin/eventos'
+    | '/admin/inventario'
+    | '/admin/salas'
+    | '/admin/tags'
+    | '/admin/usuarios'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -100,6 +178,12 @@ export interface RootRouteChildren {
   JustificativasRoute: typeof JustificativasRoute
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
+  AdminEventosRoute: typeof AdminEventosRoute
+  AdminInventarioRoute: typeof AdminInventarioRoute
+  AdminSalasRoute: typeof AdminSalasRoute
+  AdminTagsRoute: typeof AdminTagsRoute
+  AdminUsuariosRoute: typeof AdminUsuariosRoute
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -146,6 +230,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/usuarios': {
+      id: '/admin/usuarios'
+      path: '/admin/usuarios'
+      fullPath: '/admin/usuarios'
+      preLoaderRoute: typeof AdminUsuariosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/tags': {
+      id: '/admin/tags'
+      path: '/admin/tags'
+      fullPath: '/admin/tags'
+      preLoaderRoute: typeof AdminTagsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/salas': {
+      id: '/admin/salas'
+      path: '/admin/salas'
+      fullPath: '/admin/salas'
+      preLoaderRoute: typeof AdminSalasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/inventario': {
+      id: '/admin/inventario'
+      path: '/admin/inventario'
+      fullPath: '/admin/inventario'
+      preLoaderRoute: typeof AdminInventarioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/eventos': {
+      id: '/admin/eventos'
+      path: '/admin/eventos'
+      fullPath: '/admin/eventos'
+      preLoaderRoute: typeof AdminEventosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -156,6 +282,12 @@ const rootRouteChildren: RootRouteChildren = {
   JustificativasRoute: JustificativasRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
+  AdminEventosRoute: AdminEventosRoute,
+  AdminInventarioRoute: AdminInventarioRoute,
+  AdminSalasRoute: AdminSalasRoute,
+  AdminTagsRoute: AdminTagsRoute,
+  AdminUsuariosRoute: AdminUsuariosRoute,
+  AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
