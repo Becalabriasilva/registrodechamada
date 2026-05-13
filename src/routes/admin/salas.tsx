@@ -29,10 +29,12 @@ function Salas() {
       .order("occurred_at", { ascending: true });
     const byRoom: Record<string, Map<string, any>> = {};
     for (const l of logs ?? []) {
-      if (!l.room_id) continue;
-      byRoom[l.room_id] ??= new Map();
-      if (l.event_type === "entrada") byRoom[l.room_id].set(l.user_id, l);
-      else byRoom[l.room_id].delete(l.user_id);
+      if (!l.room_id || !l.user_id) continue;
+      const rid = l.room_id;
+      const uid = l.user_id;
+      byRoom[rid] ??= new Map();
+      if (l.event_type === "entrada") byRoom[rid].set(uid, l);
+      else byRoom[rid].delete(uid);
     }
     const result: Record<string, any[]> = {};
     for (const k in byRoom) result[k] = Array.from(byRoom[k].values());
