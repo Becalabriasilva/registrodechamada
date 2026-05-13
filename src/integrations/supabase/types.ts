@@ -14,16 +14,230 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attendance_logs: {
+        Row: {
+          event_type: Database["public"]["Enums"]["event_type"]
+          id: string
+          occurred_at: string
+          room_id: string | null
+          tag_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          event_type: Database["public"]["Enums"]["event_type"]
+          id?: string
+          occurred_at?: string
+          room_id?: string | null
+          tag_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          event_type?: Database["public"]["Enums"]["event_type"]
+          id?: string
+          occurred_at?: string
+          room_id?: string | null
+          tag_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_logs_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_logs_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          location: string | null
+          min_quantity: number
+          name: string
+          quantity: number
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          min_quantity?: number
+          name: string
+          quantity?: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          min_quantity?: number
+          name?: string
+          quantity?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      justifications: {
+        Row: {
+          created_at: string
+          end_date: string
+          file_path: string | null
+          id: string
+          reason: string
+          reviewed_by: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["justification_status"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_date: string
+          file_path?: string | null
+          id?: string
+          reason: string
+          reviewed_by?: string | null
+          start_date: string
+          status?: Database["public"]["Enums"]["justification_status"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string
+          file_path?: string | null
+          id?: string
+          reason?: string
+          reviewed_by?: string | null
+          start_date?: string
+          status?: Database["public"]["Enums"]["justification_status"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          cpf: string | null
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          matricula: string | null
+          turma: string | null
+          updated_at: string
+        }
+        Insert: {
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id: string
+          matricula?: string | null
+          turma?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          matricula?: string | null
+          turma?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      rooms: {
+        Row: {
+          capacity: number
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          capacity?: number
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      tags: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          tag_uid: string
+          user_id: string | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          tag_uid: string
+          user_id?: string | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          tag_uid?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "professor" | "aluno"
+      event_type: "entrada" | "saida"
+      justification_status: "pendente" | "aprovado" | "rejeitado"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +364,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "professor", "aluno"],
+      event_type: ["entrada", "saida"],
+      justification_status: ["pendente", "aprovado", "rejeitado"],
+    },
   },
 } as const
