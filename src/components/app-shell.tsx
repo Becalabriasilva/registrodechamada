@@ -2,11 +2,13 @@ import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import {
   ScanLine, LayoutDashboard, FileText, Clock, LogOut,
-  Users, DoorOpen, Tags, Boxes, ClipboardList, Shield,
+  Users, DoorOpen, Tags, ClipboardList, Shield, FileCheck, BarChart3, Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const studentNav = [
   { to: "/dashboard", label: "Painel", icon: LayoutDashboard },
@@ -20,17 +22,36 @@ const adminNav = [
   { to: "/admin/usuarios", label: "Usuários", icon: Users },
   { to: "/admin/tags", label: "Tags RFID", icon: Tags },
   { to: "/admin/eventos", label: "Eventos", icon: ClipboardList },
-  { to: "/admin/inventario", label: "Inventário", icon: Boxes },
+  { to: "/admin/justificativas", label: "Justificativas", icon: FileCheck, notify: true as const },
+  { to: "/admin/relatorios", label: "Relatórios", icon: BarChart3 },
 ];
 
 export function AppShell({ children, mode }: { children: ReactNode; mode: "student" | "admin" }) {
   const { user, loading, signOut, isAdmin } = useAuth();
   const nav = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const [pendingJust, setPendingJust] = useState(0);
 
   useEffect(() => {
     if (!loading && !user) nav({ to: "/login" });
   }, [loading, user, nav]);
+
+  useEffect(() => {
+    if (mode !== "admin" || !isAdmin) return;
+    let cancelled = false;
+    const refresh = async () => {
+      const { count } = await supabase
+        .from("justifications").select("id", { count: "exact", head: true })
+        .eq("status", "pendente");
+      if (!cancelled) setPendingJust(count ?? 0);
+    };
+    refresh();
+    const ch = supabase
+      .channel("just-pending")
+      .on("postgres_changes", { event: "*", schema: "public", table: "justifications" }, refresh)
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(ch); };
+  }, [mode, isAdmin]);
 
   if (loading || !user) {
     return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Carregando...</div>;
@@ -45,22 +66,35 @@ export function AppShell({ children, mode }: { children: ReactNode; mode: "stude
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <ScanLine className="h-4 w-4" />
           </div>
-          <span className="font-semibold tracking-tight">FrequênciaTAG</span>
+          <span className="font-semibold tracking-tight">FrequentarAgora</span>
+          {mode === "admin" && pendingJust > 0 && (
+            <span className="ml-auto flex items-center gap-1 rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-medium text-destructive">
+              <Bell className="h-3 w-3" /> {pendingJust}
+            </span>
+          )}
         </div>
         <nav className="flex-1 space-y-1 p-3">
           {items.map((it) => {
             const active = path === it.to;
+            const showBadge = "notify" in it && it.notify && pendingJust > 0;
             return (
               <Link
                 key={it.to}
                 to={it.to}
                 className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
+                  "flex items-center justify-between gap-3 rounded-md px-3 py-2 text-sm transition-colors",
                   active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary hover:text-foreground",
                 )}
               >
-                <it.icon className="h-4 w-4" />
-                {it.label}
+                <span className="flex items-center gap-3">
+                  <it.icon className="h-4 w-4" />
+                  {it.label}
+                </span>
+                {showBadge && (
+                  <Badge variant={active ? "secondary" : "destructive"} className="h-5 min-w-5 px-1.5 text-[10px]">
+                    {pendingJust}
+                  </Badge>
+                )}
               </Link>
             );
           })}

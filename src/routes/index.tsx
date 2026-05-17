@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ScanLine, ShieldCheck, BarChart3, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { KimonoBg } from "@/components/kimono-bg";
 
 export const Route = createFileRoute("/")({
   component: Landing,
@@ -8,32 +9,33 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border/60">
+    <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
+      <KimonoBg />
+
+      <header className="relative border-b border-border/60 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <ScanLine className="h-5 w-5" />
             </div>
-            <span className="text-lg font-semibold tracking-tight">FrequênciaTAG</span>
+            <span className="text-lg font-semibold tracking-tight">FrequentarAgora</span>
           </div>
           <div className="flex items-center gap-2">
             <Link to="/login"><Button variant="ghost">Entrar</Button></Link>
-            <Link to="/signup"><Button>Criar conta</Button></Link>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 py-20">
+      <main className="relative mx-auto max-w-6xl px-6 py-20">
         <div className="max-w-3xl">
-          <span className="inline-flex items-center rounded-full border border-border bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
+          <span className="inline-flex items-center rounded-full border border-border bg-card/80 px-3 py-1 text-xs font-medium text-secondary-foreground backdrop-blur">
             RFID · Acadêmico · Tempo real
           </span>
           <h1 className="mt-6 text-5xl font-bold tracking-tight md:text-6xl">
-            Controle de presença e materiais, automatizado por TAG.
+            Controle de presença automatizado.
           </h1>
           <p className="mt-6 text-lg text-muted-foreground">
-            Registre entradas e saídas via leitor RFID, gerencie justificativas, salas e estoque
+            Registre entradas e saídas via leitor RFID, gerencie justificativas e relatórios
             em uma plataforma única e profissional.
           </p>
           <div className="mt-8 flex gap-3">
@@ -42,9 +44,6 @@ function Landing() {
                 Acessar painel <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
-            <Link to="/signup">
-              <Button size="lg" variant="outline">Cadastrar aluno</Button>
-            </Link>
           </div>
         </div>
 
@@ -52,9 +51,9 @@ function Landing() {
           {[
             { icon: ScanLine, title: "Leitura RFID", desc: "Hardware externo registra eventos automaticamente no banco." },
             { icon: ShieldCheck, title: "Justificativas", desc: "Upload de atestados em PDF/imagem com aprovação do ADM." },
-            { icon: BarChart3, title: "Relatórios", desc: "Filtros por turma, aluno e período com extrato detalhado." },
+            { icon: BarChart3, title: "Relatórios", desc: "Filtros por turma, aluno, sala e período com exportação CSV." },
           ].map((f) => (
-            <div key={f.title} className="rounded-lg border border-border bg-card p-6">
+            <div key={f.title} className="rounded-lg border border-border bg-card/90 p-6 backdrop-blur">
               <f.icon className="h-6 w-6 text-primary" />
               <h3 className="mt-4 font-semibold">{f.title}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{f.desc}</p>

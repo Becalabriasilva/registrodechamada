@@ -19,7 +19,6 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminUsuariosRouteImport } from './routes/admin/usuarios'
 import { Route as AdminTagsRouteImport } from './routes/admin/tags'
 import { Route as AdminSalasRouteImport } from './routes/admin/salas'
-import { Route as AdminInventarioRouteImport } from './routes/admin/inventario'
 import { Route as AdminEventosRouteImport } from './routes/admin/eventos'
 
 const SignupRoute = SignupRouteImport.update({
@@ -72,11 +71,6 @@ const AdminSalasRoute = AdminSalasRouteImport.update({
   path: '/admin/salas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminInventarioRoute = AdminInventarioRouteImport.update({
-  id: '/admin/inventario',
-  path: '/admin/inventario',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AdminEventosRoute = AdminEventosRouteImport.update({
   id: '/admin/eventos',
   path: '/admin/eventos',
@@ -91,7 +85,6 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/admin/eventos': typeof AdminEventosRoute
-  '/admin/inventario': typeof AdminInventarioRoute
   '/admin/salas': typeof AdminSalasRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -105,7 +98,6 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/admin/eventos': typeof AdminEventosRoute
-  '/admin/inventario': typeof AdminInventarioRoute
   '/admin/salas': typeof AdminSalasRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -120,7 +112,6 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/admin/eventos': typeof AdminEventosRoute
-  '/admin/inventario': typeof AdminInventarioRoute
   '/admin/salas': typeof AdminSalasRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -136,7 +127,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/admin/eventos'
-    | '/admin/inventario'
     | '/admin/salas'
     | '/admin/tags'
     | '/admin/usuarios'
@@ -150,7 +140,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/admin/eventos'
-    | '/admin/inventario'
     | '/admin/salas'
     | '/admin/tags'
     | '/admin/usuarios'
@@ -164,7 +153,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/admin/eventos'
-    | '/admin/inventario'
     | '/admin/salas'
     | '/admin/tags'
     | '/admin/usuarios'
@@ -179,7 +167,6 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
   AdminEventosRoute: typeof AdminEventosRoute
-  AdminInventarioRoute: typeof AdminInventarioRoute
   AdminSalasRoute: typeof AdminSalasRoute
   AdminTagsRoute: typeof AdminTagsRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
@@ -258,13 +245,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSalasRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/inventario': {
-      id: '/admin/inventario'
-      path: '/admin/inventario'
-      fullPath: '/admin/inventario'
-      preLoaderRoute: typeof AdminInventarioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/admin/eventos': {
       id: '/admin/eventos'
       path: '/admin/eventos'
@@ -283,7 +263,6 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
   AdminEventosRoute: AdminEventosRoute,
-  AdminInventarioRoute: AdminInventarioRoute,
   AdminSalasRoute: AdminSalasRoute,
   AdminTagsRoute: AdminTagsRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
@@ -292,3 +271,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

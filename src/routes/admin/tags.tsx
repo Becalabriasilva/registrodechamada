@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TagScanPicker } from "@/components/tag-scan-picker";
 import { toast } from "sonner";
 import { Plus, Trash2 } from "lucide-react";
 
@@ -20,7 +21,10 @@ function Tags() {
   const [userId, setUserId] = useState<string>("");
 
   async function load() {
-    const { data: t } = await supabase.from("tags").select("*,profiles:profiles!tags_user_id_fkey(full_name,matricula)").order("created_at", { ascending: false });
+    const { data: t } = await supabase
+      .from("tags")
+      .select("*,profiles:profiles!tags_user_id_fkey(full_name,matricula)")
+      .order("created_at", { ascending: false });
     setTags(t ?? []);
     const { data: u } = await supabase.from("profiles").select("id,full_name,matricula").order("full_name");
     setUsers(u ?? []);
@@ -46,29 +50,36 @@ function Tags() {
       <AppShell mode="admin">
         <header className="mb-8">
           <h1 className="text-3xl font-semibold tracking-tight">Tags RFID</h1>
-          <p className="text-sm text-muted-foreground">Vincule etiquetas físicas aos alunos.</p>
+          <p className="text-sm text-muted-foreground">Cadastre tags lidas pelo leitor e vincule a usuários.</p>
         </header>
 
-        <Card className="mb-6">
-          <CardHeader><CardTitle>Cadastrar tag</CardTitle></CardHeader>
-          <CardContent>
-            <form onSubmit={add} className="flex flex-wrap items-end gap-3">
-              <div className="flex-1 min-w-[200px]"><Label>UID da tag</Label><Input required value={tagUid} onChange={(e) => setTagUid(e.target.value)} placeholder="04:A3:B2:..." /></div>
-              <div className="flex-1 min-w-[220px]">
-                <Label>Aluno</Label>
-                <Select value={userId} onValueChange={setUserId}>
-                  <SelectTrigger><SelectValue placeholder="Selecione (opcional)" /></SelectTrigger>
-                  <SelectContent>
-                    {users.map((u) => <SelectItem key={u.id} value={u.id}>{u.full_name} {u.matricula ? `(${u.matricula})` : ""}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button type="submit" className="gap-2"><Plus className="h-4 w-4" />Adicionar</Button>
-            </form>
-          </CardContent>
-        </Card>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card>
+            <CardHeader><CardTitle>Cadastrar tag</CardTitle></CardHeader>
+            <CardContent>
+              <form onSubmit={add} className="space-y-3">
+                <div>
+                  <Label>UID da tag</Label>
+                  <Input required value={tagUid} onChange={(e) => setTagUid(e.target.value)} placeholder="04:A3:B2:..." />
+                </div>
+                <div>
+                  <Label>Aluno (opcional)</Label>
+                  <Select value={userId} onValueChange={setUserId}>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>
+                      {users.map((u) => <SelectItem key={u.id} value={u.id}>{u.full_name} {u.matricula ? `(${u.matricula})` : ""}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button type="submit" className="gap-2"><Plus className="h-4 w-4" />Adicionar</Button>
+              </form>
+            </CardContent>
+          </Card>
 
-        <Card>
+          <TagScanPicker onPick={(uid) => { setTagUid(uid); toast.info(`UID ${uid} preenchido no formulário`); }} />
+        </div>
+
+        <Card className="mt-6">
           <CardHeader><CardTitle>{tags.length} tag(s)</CardTitle></CardHeader>
           <CardContent>
             <table className="w-full text-sm">

@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { ScanLine } from "lucide-react";
 import { toast } from "sonner";
 
@@ -15,6 +16,10 @@ function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -25,6 +30,18 @@ function Login() {
     nav({ to: "/dashboard" });
   }
 
+  async function onReset(e: React.FormEvent) {
+    e.preventDefault();
+    setResetLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: `${window.location.origin}/set-password`,
+    });
+    setResetLoading(false);
+    if (error) return toast.error(error.message);
+    toast.success("Se o e-mail existir, enviaremos um link de recuperação.");
+    setResetOpen(false);
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
@@ -32,7 +49,7 @@ function Login() {
           <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <ScanLine className="h-5 w-5" />
           </div>
-          <span className="text-lg font-semibold">FrequênciaTAG</span>
+          <span className="text-lg font-semibold">FrequentarAgora</span>
         </Link>
         <h1 className="text-2xl font-semibold">Entrar</h1>
         <p className="mt-1 text-sm text-muted-foreground">Acesse seu painel acadêmico.</p>
@@ -42,16 +59,36 @@ function Login() {
             <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div>
-            <Label htmlFor="password">Senha</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Senha</Label>
+              <Dialog open={resetOpen} onOpenChange={setResetOpen}>
+                <DialogTrigger asChild>
+                  <button type="button" className="text-xs text-primary hover:underline">Esqueci a senha</button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader><DialogTitle>Recuperar senha</DialogTitle></DialogHeader>
+                  <form onSubmit={onReset} className="space-y-4">
+                    <div>
+                      <Label htmlFor="resetEmail">E-mail cadastrado</Label>
+                      <Input id="resetEmail" type="email" required value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} />
+                    </div>
+                    <DialogFooter>
+                      <Button type="submit" disabled={resetLoading}>
+                        {resetLoading ? "Enviando..." : "Enviar link"}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
             <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Entrando..." : "Entrar"}
           </Button>
         </form>
-        <p className="mt-4 text-center text-sm text-muted-foreground">
-          Não tem conta?{" "}
-          <Link to="/signup" className="text-primary hover:underline">Cadastre-se</Link>
+        <p className="mt-4 text-center text-xs text-muted-foreground">
+          O cadastro de novos usuários é feito pelo administrador.
         </p>
       </div>
     </div>
