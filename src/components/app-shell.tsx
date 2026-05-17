@@ -76,7 +76,7 @@ export function AppShell({ children, mode }: { children: ReactNode; mode: "stude
         <nav className="flex-1 space-y-1 p-3">
           {items.map((it) => {
             const active = path === it.to;
-            const showBadge = "notify" in it && it.notify && pendingJust > 0;
+            const showBadge = ("notify" in it && (it as { notify?: boolean }).notify && pendingJust > 0) as boolean;
             return (
               <Link
                 key={it.to}

@@ -26,11 +26,14 @@ function AdminJust() {
   const [tab, setTab] = useState("pendente");
 
   async function load() {
-    const { data } = await supabase
-      .from("justifications")
-      .select("*,profiles:profiles!justifications_user_id_fkey(full_name,matricula,turma)")
-      .order("created_at", { ascending: false });
-    setList((data ?? []) as J[]);
+    const { data: js } = await supabase
+      .from("justifications").select("*").order("created_at", { ascending: false });
+    const userIds = Array.from(new Set((js ?? []).map((j) => j.user_id)));
+    const { data: profs } = userIds.length
+      ? await supabase.from("profiles").select("id,full_name,matricula,turma").in("id", userIds)
+      : { data: [] as any[] };
+    const pmap = new Map((profs ?? []).map((p: any) => [p.id, p]));
+    setList(((js ?? []) as any[]).map((j) => ({ ...j, profiles: pmap.get(j.user_id) ?? null })) as J[]);
   }
   useEffect(() => { load(); }, []);
 
