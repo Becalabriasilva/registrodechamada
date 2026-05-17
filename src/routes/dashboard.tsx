@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { AppShell } from "@/components/app-shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Activity, LogIn, LogOut, Tag } from "lucide-react";
+import { Activity, CheckCircle2, XCircle, LogIn, LogOut, Tag } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({ component: Dashboard });
 
@@ -24,7 +24,7 @@ function Dashboard() {
       const [{ data: p }, { data: l }, { data: t }] = await Promise.all([
         supabase.from("profiles").select("full_name,matricula,turma").eq("id", user.id).maybeSingle(),
         supabase.from("attendance_logs").select("*").eq("user_id", user.id).order("occurred_at", { ascending: false }).limit(20),
-        supabase.from("tags").select("tag_uid").eq("user_id", user.id).maybeSingle(),
+        supabase.from("tags").select("tag_uid").eq("user_id", user.id).eq("active", true).maybeSingle(),
       ]);
       setProfile(p as Profile | null);
       setLogs((l ?? []) as LogRow[]);
@@ -39,7 +39,8 @@ function Dashboard() {
   }, [user]);
 
   const last = logs[0];
-  const status = last?.event_type === "entrada" ? "Presente" : last?.event_type === "saida" ? "Ausente" : "Sem registros";
+  const isPresent = last?.event_type === "entrada";
+  const hasAny = !!last;
 
   const today = new Date().toDateString();
   const todayLogs = logs.filter((l) => new Date(l.occurred_at).toDateString() === today);
@@ -52,11 +53,40 @@ function Dashboard() {
         <p className="text-sm text-muted-foreground">Matrícula {profile?.matricula ?? "—"} · Turma {profile?.turma ?? "—"}</p>
       </header>
 
+      {/* Cartão grande de situação atual */}
+      <Card
+        className={
+          "mb-6 overflow-hidden border-2 " +
+          (isPresent ? "border-emerald-500/40 bg-emerald-50/60" : hasAny ? "border-amber-500/40 bg-amber-50/60" : "border-border bg-card")
+        }
+      >
+        <CardContent className="flex flex-wrap items-center justify-between gap-6 p-8">
+          <div className="flex items-center gap-5">
+            <div
+              className={
+                "flex h-16 w-16 items-center justify-center rounded-full " +
+                (isPresent ? "bg-emerald-500 text-white" : hasAny ? "bg-amber-500 text-white" : "bg-muted text-muted-foreground")
+              }
+            >
+              {isPresent ? <CheckCircle2 className="h-8 w-8" /> : <XCircle className="h-8 w-8" />}
+            </div>
+            <div>
+              <div className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Situação atual</div>
+              <div className="text-3xl font-bold">
+                {isPresent ? "Presente" : hasAny ? "Ausente" : "Sem registros"}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {hasAny ? `Última leitura: ${new Date(last.occurred_at).toLocaleString("pt-BR")}` : "Nenhuma leitura ainda"}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid gap-4 md:grid-cols-3">
-        <StatCard icon={Activity} label="Status atual" value={status}
-          accent={last?.event_type === "entrada" ? "ok" : last?.event_type === "saida" ? "warn" : "muted"} />
-        <StatCard icon={Tag} label="Tag RFID" value={tag ?? "Não vinculada"} accent={tag ? "ok" : "muted"} />
-        <StatCard icon={LogIn} label="Eventos hoje" value={String(todayLogs.length)} accent="muted" />
+        <StatCard icon={Activity} label="Eventos hoje" value={String(todayLogs.length)} />
+        <StatCard icon={Tag} label="Tag RFID" value={tag ?? "Não vinculada"} muted={!tag} />
+        <StatCard icon={LogIn} label="Total registros" value={String(logs.length)} />
       </div>
 
       <Card className="mt-8">
@@ -75,7 +105,7 @@ function Dashboard() {
                       <div className="text-xs text-muted-foreground">{new Date(l.occurred_at).toLocaleString("pt-BR")}</div>
                     </div>
                   </div>
-                  <Badge variant="outline">{l.event_type === "entrada" ? "Presente" : "Saída"}</Badge>
+                  <Badge variant="outline">{l.event_type === "entrada" ? "Entrada" : "Saída"}</Badge>
                 </li>
               ))}
             </ul>
@@ -86,15 +116,11 @@ function Dashboard() {
   );
 }
 
-function StatCard({ icon: Icon, label, value, accent }: { icon: any; label: string; value: string; accent: "ok" | "warn" | "muted" }) {
-  const color =
-    accent === "ok" ? "bg-emerald-500/10 text-emerald-700" :
-    accent === "warn" ? "bg-amber-500/10 text-amber-700" :
-    "bg-secondary text-secondary-foreground";
+function StatCard({ icon: Icon, label, value, muted }: { icon: any; label: string; value: string; muted?: boolean }) {
   return (
     <Card>
       <CardContent className="flex items-center gap-4 p-6">
-        <div className={`flex h-11 w-11 items-center justify-center rounded-md ${color}`}>
+        <div className={"flex h-11 w-11 items-center justify-center rounded-md " + (muted ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary")}>
           <Icon className="h-5 w-5" />
         </div>
         <div>

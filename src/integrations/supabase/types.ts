@@ -96,6 +96,7 @@ export type Database = {
           file_path: string | null
           id: string
           reason: string
+          reviewed_at: string | null
           reviewed_by: string | null
           start_date: string
           status: Database["public"]["Enums"]["justification_status"]
@@ -107,6 +108,7 @@ export type Database = {
           file_path?: string | null
           id?: string
           reason: string
+          reviewed_at?: string | null
           reviewed_by?: string | null
           start_date: string
           status?: Database["public"]["Enums"]["justification_status"]
@@ -118,9 +120,34 @@ export type Database = {
           file_path?: string | null
           id?: string
           reason?: string
+          reviewed_at?: string | null
           reviewed_by?: string | null
           start_date?: string
           status?: Database["public"]["Enums"]["justification_status"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      professor_assignments: {
+        Row: {
+          created_at: string
+          id: string
+          room_id: string | null
+          turma: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          room_id?: string | null
+          turma?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          room_id?: string | null
+          turma?: string | null
           user_id?: string
         }
         Relationships: []
@@ -179,6 +206,27 @@ export type Database = {
         }
         Relationships: []
       }
+      tag_scans: {
+        Row: {
+          consumed: boolean
+          id: string
+          scanned_at: string
+          tag_uid: string
+        }
+        Insert: {
+          consumed?: boolean
+          id?: string
+          scanned_at?: string
+          tag_uid: string
+        }
+        Update: {
+          consumed?: boolean
+          id?: string
+          scanned_at?: string
+          tag_uid?: string
+        }
+        Relationships: []
+      }
       tags: {
         Row: {
           active: boolean
@@ -231,6 +279,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      professor_has_scope: {
+        Args: { _room_id: string; _turma: string; _user_id: string }
         Returns: boolean
       }
     }
