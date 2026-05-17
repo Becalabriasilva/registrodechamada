@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SetPasswordRouteImport } from './routes/set-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as JustificativasRouteImport } from './routes/justificativas'
 import { Route as ExtratoRouteImport } from './routes/extrato'
@@ -19,11 +20,19 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminUsuariosRouteImport } from './routes/admin/usuarios'
 import { Route as AdminTagsRouteImport } from './routes/admin/tags'
 import { Route as AdminSalasRouteImport } from './routes/admin/salas'
+import { Route as AdminRelatoriosRouteImport } from './routes/admin/relatorios'
+import { Route as AdminJustificativasRouteImport } from './routes/admin/justificativas'
 import { Route as AdminEventosRouteImport } from './routes/admin/eventos'
+import { Route as ApiPublicRfidScanRouteImport } from './routes/api/public/rfid-scan'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SetPasswordRoute = SetPasswordRouteImport.update({
+  id: '/set-password',
+  path: '/set-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -71,9 +80,24 @@ const AdminSalasRoute = AdminSalasRouteImport.update({
   path: '/admin/salas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRelatoriosRoute = AdminRelatoriosRouteImport.update({
+  id: '/admin/relatorios',
+  path: '/admin/relatorios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminJustificativasRoute = AdminJustificativasRouteImport.update({
+  id: '/admin/justificativas',
+  path: '/admin/justificativas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminEventosRoute = AdminEventosRouteImport.update({
   id: '/admin/eventos',
   path: '/admin/eventos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicRfidScanRoute = ApiPublicRfidScanRouteImport.update({
+  id: '/api/public/rfid-scan',
+  path: '/api/public/rfid-scan',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -83,12 +107,16 @@ export interface FileRoutesByFullPath {
   '/extrato': typeof ExtratoRoute
   '/justificativas': typeof JustificativasRoute
   '/login': typeof LoginRoute
+  '/set-password': typeof SetPasswordRoute
   '/signup': typeof SignupRoute
   '/admin/eventos': typeof AdminEventosRoute
+  '/admin/justificativas': typeof AdminJustificativasRoute
+  '/admin/relatorios': typeof AdminRelatoriosRoute
   '/admin/salas': typeof AdminSalasRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/public/rfid-scan': typeof ApiPublicRfidScanRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -96,12 +124,16 @@ export interface FileRoutesByTo {
   '/extrato': typeof ExtratoRoute
   '/justificativas': typeof JustificativasRoute
   '/login': typeof LoginRoute
+  '/set-password': typeof SetPasswordRoute
   '/signup': typeof SignupRoute
   '/admin/eventos': typeof AdminEventosRoute
+  '/admin/justificativas': typeof AdminJustificativasRoute
+  '/admin/relatorios': typeof AdminRelatoriosRoute
   '/admin/salas': typeof AdminSalasRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin': typeof AdminIndexRoute
+  '/api/public/rfid-scan': typeof ApiPublicRfidScanRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -110,12 +142,16 @@ export interface FileRoutesById {
   '/extrato': typeof ExtratoRoute
   '/justificativas': typeof JustificativasRoute
   '/login': typeof LoginRoute
+  '/set-password': typeof SetPasswordRoute
   '/signup': typeof SignupRoute
   '/admin/eventos': typeof AdminEventosRoute
+  '/admin/justificativas': typeof AdminJustificativasRoute
+  '/admin/relatorios': typeof AdminRelatoriosRoute
   '/admin/salas': typeof AdminSalasRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/public/rfid-scan': typeof ApiPublicRfidScanRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -125,12 +161,16 @@ export interface FileRouteTypes {
     | '/extrato'
     | '/justificativas'
     | '/login'
+    | '/set-password'
     | '/signup'
     | '/admin/eventos'
+    | '/admin/justificativas'
+    | '/admin/relatorios'
     | '/admin/salas'
     | '/admin/tags'
     | '/admin/usuarios'
     | '/admin/'
+    | '/api/public/rfid-scan'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -138,12 +178,16 @@ export interface FileRouteTypes {
     | '/extrato'
     | '/justificativas'
     | '/login'
+    | '/set-password'
     | '/signup'
     | '/admin/eventos'
+    | '/admin/justificativas'
+    | '/admin/relatorios'
     | '/admin/salas'
     | '/admin/tags'
     | '/admin/usuarios'
     | '/admin'
+    | '/api/public/rfid-scan'
   id:
     | '__root__'
     | '/'
@@ -151,12 +195,16 @@ export interface FileRouteTypes {
     | '/extrato'
     | '/justificativas'
     | '/login'
+    | '/set-password'
     | '/signup'
     | '/admin/eventos'
+    | '/admin/justificativas'
+    | '/admin/relatorios'
     | '/admin/salas'
     | '/admin/tags'
     | '/admin/usuarios'
     | '/admin/'
+    | '/api/public/rfid-scan'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -165,12 +213,16 @@ export interface RootRouteChildren {
   ExtratoRoute: typeof ExtratoRoute
   JustificativasRoute: typeof JustificativasRoute
   LoginRoute: typeof LoginRoute
+  SetPasswordRoute: typeof SetPasswordRoute
   SignupRoute: typeof SignupRoute
   AdminEventosRoute: typeof AdminEventosRoute
+  AdminJustificativasRoute: typeof AdminJustificativasRoute
+  AdminRelatoriosRoute: typeof AdminRelatoriosRoute
   AdminSalasRoute: typeof AdminSalasRoute
   AdminTagsRoute: typeof AdminTagsRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  ApiPublicRfidScanRoute: typeof ApiPublicRfidScanRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -180,6 +232,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/set-password': {
+      id: '/set-password'
+      path: '/set-password'
+      fullPath: '/set-password'
+      preLoaderRoute: typeof SetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -245,11 +304,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSalasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/relatorios': {
+      id: '/admin/relatorios'
+      path: '/admin/relatorios'
+      fullPath: '/admin/relatorios'
+      preLoaderRoute: typeof AdminRelatoriosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/justificativas': {
+      id: '/admin/justificativas'
+      path: '/admin/justificativas'
+      fullPath: '/admin/justificativas'
+      preLoaderRoute: typeof AdminJustificativasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/eventos': {
       id: '/admin/eventos'
       path: '/admin/eventos'
       fullPath: '/admin/eventos'
       preLoaderRoute: typeof AdminEventosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/rfid-scan': {
+      id: '/api/public/rfid-scan'
+      path: '/api/public/rfid-scan'
+      fullPath: '/api/public/rfid-scan'
+      preLoaderRoute: typeof ApiPublicRfidScanRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -261,23 +341,17 @@ const rootRouteChildren: RootRouteChildren = {
   ExtratoRoute: ExtratoRoute,
   JustificativasRoute: JustificativasRoute,
   LoginRoute: LoginRoute,
+  SetPasswordRoute: SetPasswordRoute,
   SignupRoute: SignupRoute,
   AdminEventosRoute: AdminEventosRoute,
+  AdminJustificativasRoute: AdminJustificativasRoute,
+  AdminRelatoriosRoute: AdminRelatoriosRoute,
   AdminSalasRoute: AdminSalasRoute,
   AdminTagsRoute: AdminTagsRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
   AdminIndexRoute: AdminIndexRoute,
+  ApiPublicRfidScanRoute: ApiPublicRfidScanRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
