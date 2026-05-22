@@ -189,20 +189,32 @@ export type Database = {
         Row: {
           capacity: number
           created_at: string
+          cutoff_time: string | null
+          days_of_week: number[]
+          end_time: string | null
           id: string
           name: string
+          start_time: string | null
         }
         Insert: {
           capacity?: number
           created_at?: string
+          cutoff_time?: string | null
+          days_of_week?: number[]
+          end_time?: string | null
           id?: string
           name: string
+          start_time?: string | null
         }
         Update: {
           capacity?: number
           created_at?: string
+          cutoff_time?: string | null
+          days_of_week?: number[]
+          end_time?: string | null
           id?: string
           name?: string
+          start_time?: string | null
         }
         Relationships: []
       }

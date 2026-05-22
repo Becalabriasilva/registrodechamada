@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { PreferencesToggle } from "@/components/preferences-toggle";
 
 const studentNav = [
   { to: "/dashboard", label: "Painel", icon: LayoutDashboard },
@@ -110,7 +111,10 @@ export function AppShell({ children, mode }: { children: ReactNode; mode: "stude
           )}
         </nav>
         <div className="border-t border-border p-3">
-          <div className="px-3 pb-2 text-xs text-muted-foreground truncate">{user.email}</div>
+          <div className="flex items-center justify-between px-1 pb-2">
+            <div className="px-2 text-xs text-muted-foreground truncate">{user.email}</div>
+            <PreferencesToggle />
+          </div>
           <Button variant="ghost" className="w-full justify-start gap-2" onClick={async () => { await signOut(); nav({ to: "/login" }); }}>
             <LogOut className="h-4 w-4" /> Sair
           </Button>
