@@ -21,14 +21,13 @@ function Dashboard() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [{ data: p }, { data: l }, { data: t }] = await Promise.all([
+      const [{ data: p }, { data: l }] = await Promise.all([
         supabase.from("profiles").select("full_name,matricula,turma").eq("id", user.id).maybeSingle(),
         supabase.from("attendance_logs").select("*").eq("user_id", user.id).order("occurred_at", { ascending: false }).limit(20),
-        supabase.from("tags").select("tag_uid").eq("user_id", user.id).eq("active", true).maybeSingle(),
       ]);
       setProfile(p as Profile | null);
       setLogs((l ?? []) as LogRow[]);
-      setTag(t?.tag_uid ?? null);
+      setTag(null);
     })();
 
     const ch = supabase.channel("logs-self")
