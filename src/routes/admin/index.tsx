@@ -17,7 +17,7 @@ function AdminHome() {
       const [u, r, t, j, logs] = await Promise.all([
         supabase.from("profiles").select("id", { count: "exact", head: true }),
         supabase.from("rooms").select("id", { count: "exact", head: true }),
-        supabase.from("tags").select("id", { count: "exact", head: true }),
+        supabase.from("registros_rfid").select("id", { count: "exact", head: true }),
         supabase.from("justifications").select("id", { count: "exact", head: true }).eq("status", "pendente"),
         supabase.from("attendance_logs").select("id,event_type,occurred_at,user_id,profiles:profiles!attendance_logs_user_id_fkey(full_name)").order("occurred_at", { ascending: false }).limit(10),
       ]);
