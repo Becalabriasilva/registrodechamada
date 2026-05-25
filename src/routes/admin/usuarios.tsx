@@ -26,12 +26,14 @@ function Usuarios() {
   const [q, setQ] = useState("");
   const [openCreate, setOpenCreate] = useState(false);
   const [updateUid, setUpdateUid] = useState<{ id: string; name: string } | null>(null);
+  const [editing, setEditing] = useState<Row | null>(null);
 
   const createFn = useServerFn(createUserInvite);
   const updateTagFn = useServerFn(updateUserTag);
+  const updateUserFn = useServerFn(updateUser);
 
   async function load() {
-    const { data: profiles } = await supabase.from("profiles").select("id,full_name,matricula,turma,email").order("full_name");
+    const { data: profiles } = await supabase.from("profiles").select("id,full_name,matricula,turma,cpf,email").order("full_name");
     const { data: roles } = await supabase.from("user_roles").select("user_id,role");
     const { data: tags } = await supabase.from("tags").select("user_id,tag_uid").eq("active", true);
     const { data: rs } = await supabase.from("rooms").select("id,name").order("name");
