@@ -57,11 +57,11 @@ export const createUserInvite = createServerFn({ method: "POST" })
 
     if (data.tag_uid) {
       const { data: existing } = await supabaseAdmin
-        .from("tags").select("id").eq("tag_uid", data.tag_uid).maybeSingle();
+        .from("registros_rfid").select("id").eq("tag_uid", data.tag_uid).maybeSingle();
       if (existing) {
-        await supabaseAdmin.from("tags").update({ user_id: uid, active: true }).eq("id", existing.id);
+        await supabaseAdmin.from("registros_rfid").update({ user_id: uid, active: true }).eq("id", existing.id);
       } else {
-        await supabaseAdmin.from("tags").insert({ tag_uid: data.tag_uid, user_id: uid });
+        await supabaseAdmin.from("registros_rfid").insert({ tag_uid: data.tag_uid, user_id: uid });
       }
       await supabaseAdmin.from("tag_scans").update({ consumed: true })
         .eq("tag_uid", data.tag_uid).eq("consumed", false);
@@ -90,13 +90,13 @@ export const updateUserTag = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.userId);
     // Desvincula tags anteriores do usuário
-    await supabaseAdmin.from("tags").update({ active: false, user_id: null }).eq("user_id", data.user_id);
+    await supabaseAdmin.from("registros_rfid").update({ active: false, user_id: null }).eq("user_id", data.user_id);
     const { data: existing } = await supabaseAdmin
-      .from("tags").select("id").eq("tag_uid", data.tag_uid).maybeSingle();
+      .from("registros_rfid").select("id").eq("tag_uid", data.tag_uid).maybeSingle();
     if (existing) {
-      await supabaseAdmin.from("tags").update({ user_id: data.user_id, active: true }).eq("id", existing.id);
+      await supabaseAdmin.from("registros_rfid").update({ user_id: data.user_id, active: true }).eq("id", existing.id);
     } else {
-      await supabaseAdmin.from("tags").insert({ tag_uid: data.tag_uid, user_id: data.user_id });
+      await supabaseAdmin.from("registros_rfid").insert({ tag_uid: data.tag_uid, user_id: data.user_id });
     }
     await supabaseAdmin.from("tag_scans").update({ consumed: true })
       .eq("tag_uid", data.tag_uid).eq("consumed", false);
