@@ -145,7 +145,7 @@ export const updateUser = createServerFn({ method: "POST" })
     if (data.turma !== undefined) profileUpdate.turma = data.turma;
     if (data.email !== undefined) profileUpdate.email = data.email;
     if (Object.keys(profileUpdate).length > 0) {
-      const { error } = await supabaseAdmin.from("profiles").update(profileUpdate).eq("id", data.user_id);
+      const { error } = await supabaseAdmin.from("profiles").update(profileUpdate as never).eq("id", data.user_id);
       if (error) throw new Error(error.message);
     }
     return { ok: true };
