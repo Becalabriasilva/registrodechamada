@@ -156,8 +156,89 @@ function Usuarios() {
             />
           </DialogContent>
         </Dialog>
+
+        {/* Dialog: editar usuário */}
+        <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+          {editing && (
+            <EditUserDialog
+              user={editing}
+              onClose={() => { setEditing(null); load(); }}
+              updateUserFn={updateUserFn}
+            />
+          )}
+        </Dialog>
       </AppShell>
     </RequireAdmin>
+  );
+}
+
+function EditUserDialog({
+  user, onClose, updateUserFn,
+}: {
+  user: Row;
+  onClose: () => void;
+  updateUserFn: ReturnType<typeof useServerFn<typeof updateUser>>;
+}) {
+  const [form, setForm] = useState({
+    email: user.email ?? "",
+    password: "",
+    full_name: user.full_name ?? "",
+    matricula: user.matricula ?? "",
+    cpf: user.cpf ?? "",
+    turma: user.turma ?? "",
+  });
+  const [loading, setLoading] = useState(false);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await updateUserFn({
+        data: {
+          user_id: user.id,
+          email: form.email || undefined,
+          password: form.password || undefined,
+          full_name: form.full_name,
+          matricula: form.matricula || null,
+          cpf: form.cpf || null,
+          turma: form.turma || null,
+        },
+      });
+      toast.success("Usuário atualizado");
+      onClose();
+    } catch (e: any) {
+      toast.error(e.message || "Falha ao atualizar");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <DialogContent className="max-w-2xl">
+      <DialogHeader><DialogTitle>Editar usuário — {user.full_name}</DialogTitle></DialogHeader>
+      <form onSubmit={onSubmit} className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div><Label>Nome completo</Label><Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} /></div>
+          <div><Label>E-mail</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+          <div><Label>Matrícula</Label><Input value={form.matricula} onChange={(e) => setForm({ ...form, matricula: e.target.value })} /></div>
+          <div><Label>CPF</Label><Input value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} /></div>
+          <div><Label>Turma</Label><Input value={form.turma} onChange={(e) => setForm({ ...form, turma: e.target.value })} /></div>
+          <div>
+            <Label>Nova senha</Label>
+            <Input
+              type="password"
+              placeholder="Deixe vazio para manter"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>
+          <Button type="submit" disabled={loading}>{loading ? "Salvando..." : "Salvar alterações"}</Button>
+        </DialogFooter>
+      </form>
+    </DialogContent>
   );
 }
 
