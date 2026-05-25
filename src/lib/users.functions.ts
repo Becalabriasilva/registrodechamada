@@ -110,6 +110,43 @@ export const simulateTagScan = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.userId);
-    await supabaseAdmin.from("tag_scans").insert({ tag_uid: data.tag_uid });
+    await supabaseAdmin.from("registros_rfid").insert({ tag_uid: data.tag_uid });
+    return { ok: true };
+  });
+
+const UpdateInput = z.object({
+  user_id: z.string().uuid(),
+  email: z.string().email().max(255).optional(),
+  password: z.string().min(6).max(72).optional().or(z.literal("")),
+  full_name: z.string().min(1).max(120).optional(),
+  matricula: z.string().max(50).optional().nullable(),
+  cpf: z.string().max(20).optional().nullable(),
+  turma: z.string().max(50).optional().nullable(),
+});
+
+export const updateUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => UpdateInput.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+
+    const authUpdate: { email?: string; password?: string } = {};
+    if (data.email) authUpdate.email = data.email;
+    if (data.password && data.password.length > 0) authUpdate.password = data.password;
+    if (Object.keys(authUpdate).length > 0) {
+      const { error } = await supabaseAdmin.auth.admin.updateUserById(data.user_id, authUpdate);
+      if (error) throw new Error(error.message);
+    }
+
+    const profileUpdate: Record<string, unknown> = {};
+    if (data.full_name !== undefined) profileUpdate.full_name = data.full_name;
+    if (data.matricula !== undefined) profileUpdate.matricula = data.matricula;
+    if (data.cpf !== undefined) profileUpdate.cpf = data.cpf;
+    if (data.turma !== undefined) profileUpdate.turma = data.turma;
+    if (data.email !== undefined) profileUpdate.email = data.email;
+    if (Object.keys(profileUpdate).length > 0) {
+      const { error } = await supabaseAdmin.from("profiles").update(profileUpdate).eq("id", data.user_id);
+      if (error) throw new Error(error.message);
+    }
     return { ok: true };
   });
