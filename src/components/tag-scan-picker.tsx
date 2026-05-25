@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Radio, RefreshCw, Zap } from "lucide-react";
 import { toast } from "sonner";
 
-interface Scan { id: string; tag_uid: string; scanned_at: string }
+interface Scan { id: number; tag_uid: string; created_at: string }
 
 export function TagScanPicker({ onPick }: { onPick: (uid: string) => void }) {
   const [scans, setScans] = useState<Scan[]>([]);
@@ -17,10 +17,9 @@ export function TagScanPicker({ onPick }: { onPick: (uid: string) => void }) {
 
   async function load() {
     const { data } = await supabase
-      .from("tag_scans")
-      .select("id,tag_uid,scanned_at")
-      .eq("consumed", false)
-      .order("scanned_at", { ascending: false })
+      .from("registros_rfid" as never)
+      .select("id,tag_uid,created_at")
+      .order("created_at", { ascending: false })
       .limit(8);
     setScans((data ?? []) as Scan[]);
   }
@@ -28,8 +27,8 @@ export function TagScanPicker({ onPick }: { onPick: (uid: string) => void }) {
   useEffect(() => {
     load();
     const ch = supabase
-      .channel("tag-scans")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "tag_scans" }, (p) => {
+      .channel("registros-rfid")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "registros_rfid" }, (p) => {
         setScans((prev) => [p.new as Scan, ...prev].slice(0, 8));
       })
       .subscribe();
@@ -56,7 +55,7 @@ export function TagScanPicker({ onPick }: { onPick: (uid: string) => void }) {
               <li key={s.id} className="flex items-center justify-between rounded-md border border-border bg-card px-3 py-2">
                 <div>
                   <div className="font-mono text-xs">{s.tag_uid}</div>
-                  <div className="text-[10px] text-muted-foreground">{new Date(s.scanned_at).toLocaleString("pt-BR")}</div>
+                  <div className="text-[10px] text-muted-foreground">{new Date(s.created_at).toLocaleString("pt-BR")}</div>
                 </div>
                 <Button type="button" size="sm" onClick={() => onPick(s.tag_uid)}>Usar</Button>
               </li>

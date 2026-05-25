@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
-import { createUserInvite, updateUserTag } from "@/lib/users.functions";
+import { createUserInvite, updateUserTag, updateUser } from "@/lib/users.functions";
 import { AppShell } from "@/components/app-shell";
 import { RequireAdmin } from "@/components/require-admin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,11 +14,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TagScanPicker } from "@/components/tag-scan-picker";
 import { toast } from "sonner";
-import { Shield, ShieldOff, Trash2, UserPlus, Tag as TagIcon, Copy } from "lucide-react";
+import { Shield, ShieldOff, Trash2, UserPlus, Tag as TagIcon, Copy, Pencil } from "lucide-react";
 
 export const Route = createFileRoute("/admin/usuarios")({ component: Usuarios });
 
-interface Row { id: string; full_name: string; matricula: string | null; turma: string | null; email: string | null; roles: string[]; tag_uid: string | null }
+interface Row { id: string; full_name: string; matricula: string | null; turma: string | null; cpf?: string | null; email: string | null; roles: string[]; tag_uid: string | null }
 
 function Usuarios() {
   const [rows, setRows] = useState<Row[]>([]);
@@ -26,12 +26,14 @@ function Usuarios() {
   const [q, setQ] = useState("");
   const [openCreate, setOpenCreate] = useState(false);
   const [updateUid, setUpdateUid] = useState<{ id: string; name: string } | null>(null);
+  const [editing, setEditing] = useState<Row | null>(null);
 
   const createFn = useServerFn(createUserInvite);
   const updateTagFn = useServerFn(updateUserTag);
+  const updateUserFn = useServerFn(updateUser);
 
   async function load() {
-    const { data: profiles } = await supabase.from("profiles").select("id,full_name,matricula,turma,email").order("full_name");
+    const { data: profiles } = await supabase.from("profiles").select("id,full_name,matricula,turma,cpf,email").order("full_name");
     const { data: roles } = await supabase.from("user_roles").select("user_id,role");
     const { data: tags } = await supabase.from("tags").select("user_id,tag_uid").eq("active", true);
     const { data: rs } = await supabase.from("rooms").select("id,name").order("name");
@@ -113,6 +115,9 @@ function Usuarios() {
                           {r.tag_uid ? <span className="font-mono text-xs">{r.tag_uid}</span> : <span className="text-muted-foreground">—</span>}
                         </td>
                         <td className="text-right whitespace-nowrap">
+                          <Button size="sm" variant="ghost" onClick={() => setEditing(r)} className="gap-1">
+                            <Pencil className="h-3.5 w-3.5" /> Editar
+                          </Button>
                           <Button size="sm" variant="ghost" onClick={() => setUpdateUid({ id: r.id, name: r.full_name })} className="gap-1">
                             <TagIcon className="h-3.5 w-3.5" /> Tag
                           </Button>
@@ -151,8 +156,89 @@ function Usuarios() {
             />
           </DialogContent>
         </Dialog>
+
+        {/* Dialog: editar usuário */}
+        <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+          {editing && (
+            <EditUserDialog
+              user={editing}
+              onClose={() => { setEditing(null); load(); }}
+              updateUserFn={updateUserFn}
+            />
+          )}
+        </Dialog>
       </AppShell>
     </RequireAdmin>
+  );
+}
+
+function EditUserDialog({
+  user, onClose, updateUserFn,
+}: {
+  user: Row;
+  onClose: () => void;
+  updateUserFn: ReturnType<typeof useServerFn<typeof updateUser>>;
+}) {
+  const [form, setForm] = useState({
+    email: user.email ?? "",
+    password: "",
+    full_name: user.full_name ?? "",
+    matricula: user.matricula ?? "",
+    cpf: user.cpf ?? "",
+    turma: user.turma ?? "",
+  });
+  const [loading, setLoading] = useState(false);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await updateUserFn({
+        data: {
+          user_id: user.id,
+          email: form.email || undefined,
+          password: form.password || undefined,
+          full_name: form.full_name,
+          matricula: form.matricula || null,
+          cpf: form.cpf || null,
+          turma: form.turma || null,
+        },
+      });
+      toast.success("Usuário atualizado");
+      onClose();
+    } catch (e: any) {
+      toast.error(e.message || "Falha ao atualizar");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <DialogContent className="max-w-2xl">
+      <DialogHeader><DialogTitle>Editar usuário — {user.full_name}</DialogTitle></DialogHeader>
+      <form onSubmit={onSubmit} className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div><Label>Nome completo</Label><Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} /></div>
+          <div><Label>E-mail</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+          <div><Label>Matrícula</Label><Input value={form.matricula} onChange={(e) => setForm({ ...form, matricula: e.target.value })} /></div>
+          <div><Label>CPF</Label><Input value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} /></div>
+          <div><Label>Turma</Label><Input value={form.turma} onChange={(e) => setForm({ ...form, turma: e.target.value })} /></div>
+          <div>
+            <Label>Nova senha</Label>
+            <Input
+              type="password"
+              placeholder="Deixe vazio para manter"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>
+          <Button type="submit" disabled={loading}>{loading ? "Salvando..." : "Salvar alterações"}</Button>
+        </DialogFooter>
+      </form>
+    </DialogContent>
   );
 }
 
