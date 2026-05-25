@@ -185,6 +185,24 @@ export type Database = {
         }
         Relationships: []
       }
+      registros_rfid: {
+        Row: {
+          created_at: string
+          id: number
+          tag_uid: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          tag_uid: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          tag_uid?: string
+        }
+        Relationships: []
+      }
       rooms: {
         Row: {
           capacity: number
