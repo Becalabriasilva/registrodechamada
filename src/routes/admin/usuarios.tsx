@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
-import { createUserInvite, updateUserTag } from "@/lib/users.functions";
+import { createUserInvite, updateUserTag, updateUser } from "@/lib/users.functions";
 import { AppShell } from "@/components/app-shell";
 import { RequireAdmin } from "@/components/require-admin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,11 +14,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TagScanPicker } from "@/components/tag-scan-picker";
 import { toast } from "sonner";
-import { Shield, ShieldOff, Trash2, UserPlus, Tag as TagIcon, Copy } from "lucide-react";
+import { Shield, ShieldOff, Trash2, UserPlus, Tag as TagIcon, Copy, Pencil } from "lucide-react";
 
 export const Route = createFileRoute("/admin/usuarios")({ component: Usuarios });
 
-interface Row { id: string; full_name: string; matricula: string | null; turma: string | null; email: string | null; roles: string[]; tag_uid: string | null }
+interface Row { id: string; full_name: string; matricula: string | null; turma: string | null; cpf?: string | null; email: string | null; roles: string[]; tag_uid: string | null }
 
 function Usuarios() {
   const [rows, setRows] = useState<Row[]>([]);
