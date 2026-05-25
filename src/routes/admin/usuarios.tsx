@@ -115,6 +115,9 @@ function Usuarios() {
                           {r.tag_uid ? <span className="font-mono text-xs">{r.tag_uid}</span> : <span className="text-muted-foreground">—</span>}
                         </td>
                         <td className="text-right whitespace-nowrap">
+                          <Button size="sm" variant="ghost" onClick={() => setEditing(r)} className="gap-1">
+                            <Pencil className="h-3.5 w-3.5" /> Editar
+                          </Button>
                           <Button size="sm" variant="ghost" onClick={() => setUpdateUid({ id: r.id, name: r.full_name })} className="gap-1">
                             <TagIcon className="h-3.5 w-3.5" /> Tag
                           </Button>
