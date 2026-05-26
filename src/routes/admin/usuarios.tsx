@@ -36,10 +36,20 @@ function Usuarios() {
     const { data: profiles } = await supabase.from("profiles").select("id,full_name,matricula,turma,cpf,email").order("full_name");
     const { data: roles } = await supabase.from("user_roles").select("user_id,role");
     const { data: rs } = await supabase.from("rooms").select("id,name").order("name");
+    const { data: tagRows } = await supabase
+      .from("registros_rfid")
+      .select("user_id,tag_uid,created_at")
+      .not("user_id", "is", null)
+      .eq("active", true)
+      .order("created_at", { ascending: false });
     setRooms(rs ?? []);
     const rmap: Record<string, string[]> = {};
     for (const r of roles ?? []) (rmap[r.user_id] ??= []).push(r.role);
-    setRows((profiles ?? []).map((p) => ({ ...p, roles: rmap[p.id] ?? [], tag_uid: null })));
+    const tmap: Record<string, string> = {};
+    for (const t of tagRows ?? []) {
+      if (t.user_id && !tmap[t.user_id]) tmap[t.user_id] = t.tag_uid;
+    }
+    setRows((profiles ?? []).map((p) => ({ ...p, roles: rmap[p.id] ?? [], tag_uid: tmap[p.id] ?? null })));
   }
   useEffect(() => { load(); }, []);
 
