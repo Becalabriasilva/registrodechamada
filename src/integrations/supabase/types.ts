@@ -187,19 +187,25 @@ export type Database = {
       }
       registros_rfid: {
         Row: {
+          active: boolean
           created_at: string
           id: number
           tag_uid: string
+          user_id: string | null
         }
         Insert: {
+          active?: boolean
           created_at?: string
           id?: number
           tag_uid: string
+          user_id?: string | null
         }
         Update: {
+          active?: boolean
           created_at?: string
           id?: number
           tag_uid?: string
+          user_id?: string | null
         }
         Relationships: []
       }
