@@ -1,39 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ScanLine, ShieldCheck, BarChart3, ArrowRight, Database } from "lucide-react";
+import { ScanLine, ShieldCheck, BarChart3, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { KimonoBg } from "@/components/kimono-bg";
-// 1. Importamos as ferramentas de lógica do React
-import { useState, useEffect } from "react"; 
 
 export const Route = createFileRoute("/")({
   component: Landing,
 });
 
 function Landing() {
-  // 2. Criamos um "espaço na memória" para guardar as tags que virão do banco
-  const [registros, setRegistros] = useState<any[]>([]);
-
-  // 3. Função que busca os dados no exato momento em que o site abre
-  useEffect(() => {
-    async function buscarTagsNoBanco() {
-      const url = "https://tceoaybrlljgqavbahzi.supabase.co/rest/v1/registros_rfid?select=*";
-      const chavePublica = "sb_publishable_7dDGaSJdv8gqJ8a3sBcMmA_l4DMS5ra";
-      const resposta = await fetch(url, {
-        method: "GET",
-        headers: {
-          "apikey": chavePublica,
-          "Authorization": `Bearer ${chavePublica}`,
-          "Content-Type": "application/json"
-        }
-      });
-      
-      const dados = await resposta.json();
-      setRegistros(dados); // Salva os dados recebidos na memória da tela
-    }
-
-    buscarTagsNoBanco();
-  }, []);
-
   return (
     <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
       <KimonoBg />
@@ -86,44 +60,6 @@ function Landing() {
             </div>
           ))}
         </div>
-
-        {/* 4. AQUI É A NOSSA ÁREA DE TESTE VIZUALIZANDO O BANCO */}
-        <div className="mt-16 rounded-lg border border-border bg-card/90 p-8 backdrop-blur">
-          <div className="flex items-center gap-3 mb-6">
-            <Database className="h-6 w-6 text-green-500" />
-            <h2 className="text-2xl font-bold">Tags Lidas pelo Hardware (Ao Vivo)</h2>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-border text-muted-foreground">
-                <tr>
-                  <th className="pb-3 font-medium">ID Interno</th>
-                  <th className="pb-3 font-medium">Código da Tag</th>
-                  <th className="pb-3 font-medium">Data e Hora</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {registros.length === 0 ? (
-                  <tr>
-                    <td colSpan={3} className="py-6 text-center text-muted-foreground">
-                      Nenhuma tag registrada ainda...
-                    </td>
-                  </tr>
-                ) : (
-                  registros.map((registro) => (
-                    <tr key={registro.id}>
-                      <td className="py-4">{registro.id}</td>
-                      <td className="py-4 font-mono font-semibold">{registro.tag_uid}</td>
-                      <td className="py-4">{new Date(registro.created_at).toLocaleString('pt-BR')}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
       </main>
     </div>
   );
